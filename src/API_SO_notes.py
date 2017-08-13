@@ -45,3 +45,8 @@ for field in wb.fields():
 #ymin = layer2.extent().yMinimum()
 #ymax = layer2.extent().yMaximum()
 #
+
+
+
+
+# Bbox only returns 2 points see:https://stackoverflow.com/questions/9070752/getting-the-bounding-box-of-a-vector-of-points
