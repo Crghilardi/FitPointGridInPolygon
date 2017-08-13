@@ -19,6 +19,10 @@ QgsMapLayerRegistry.instance().addMapLayer(wb)
 #Now to try and get some info from shapefiles 
 wb.getFeatures() #this returns an iterator object
 
+for i in wb.getFeatures(): 
+    print i.geometry
+
+
 for field in wb.fields():
     print field.name(), field.typeName() #this return attribute table info
 
