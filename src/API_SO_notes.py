@@ -16,10 +16,10 @@ QgsMapLayerRegistry.instance().addMapLayer(wb)
 
 
 ######
-#Now to try and get some info from shapefiles 
+#Now to try and get some info from shapefiles
 wb.getFeatures() #this returns an iterator object
 
-for i in wb.getFeatures(): 
+for i in wb.getFeatures():
     print i.geometry
 
 
@@ -27,7 +27,7 @@ for field in wb.fields():
     print field.name(), field.typeName() #this return attribute table info
 
 #nothing below this works...can't figure out imports.......
-#save for later 
+#save for later
 
 #https://gis.stackexchange.com/questions/176170/qgis-python-find-bounding-box-for-multiple-features
 
@@ -50,3 +50,10 @@ for field in wb.fields():
 
 
 # Bbox only returns 2 points see:https://stackoverflow.com/questions/9070752/getting-the-bounding-box-of-a-vector-of-points
+
+#Example of random points
+#https://gis.stackexchange.com/questions/151960/qgis-python-script-to-generate-random-points-many-times
+
+#for converting between units
+m = d.measurePolygon(boundary.geometry().asPolygon()[0])
+d.convertMeasurement(m, QGis.Degrees, QGis.NauticalMiles, True)
