@@ -13,7 +13,7 @@ from math import *
 #I have no idea how to handle CRS/units with this...?
 
 NPoints=25
-MaxReps=6
+MaxReps=350
 
 #testing point
 pt=QgsPoint(-115.00886,44.15480)
@@ -62,21 +62,19 @@ distSup=1.02980781586
 xmin=-116.236921306 #known interior point for testing
 ymin=42.9945993666
 
-
+#python implementation of pseudocode?
 for polygon in inlayer.getFeatures():
-
-    pointsIn=0
+    
     rep=0
-
     x=xmin
     y=ymin
     testing=[] #for testing
     distInf=0.95046957527
     distSup=1.02980781586
-#python implementation of pseudocode?
-    firstTime=True
-    rep+=1
-    while pointsIn != NPoints and rep <= MaxReps:
+    pointsIn=0
+    while pointsIn != NPoints and rep < MaxReps:
+        firstTime=True
+        rep+=1
         if not firstTime: #if I am reading the Cpp correctly, if firstTime = False, we delete everything and try again?
             testing=[] #this is overwriting, if you change to testing=testing it contains the stsrting point
         if not x >= xmax:
@@ -89,20 +87,19 @@ for polygon in inlayer.getFeatures():
                 # pr.addFeatures([fet])
                     testing.append([x,y]) # for testing
                     pointsIn+=1
-        if pointsIn > NPoints:
-            distInf = dist
-            dist = (distInf + distSup)/2
-        elif pointsIn < NPoints:
-            distSup = dist
-            dist = (distInf + distSup)/2
-        #print "y=", y
-            y+=dist
-        #print "x=", x
+                y+=dist
             x+=dist
+            if pointsIn > NPoints:
+                distInf = dist
+                dist = (distInf + distSup)/2
+            elif pointsIn < NPoints:
+                distSup = dist
+                dist = (distInf + distSup)/2
+            print [distSup,distInf,dist]
+            print "y=", y
+            print "x=", x
+            print testing
     firstTime=False
-    # no idea how to nest the tail end of this with above loops
-       
-    print testing
 print "Done!"
 
 #add point layer to QGIS map
