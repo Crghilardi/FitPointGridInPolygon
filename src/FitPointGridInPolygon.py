@@ -8,15 +8,7 @@
 from qgis.core import *
 from PyQt4.QtCore import *
 from math import *
-
-#TO DO:
-#I have no idea how to handle CRS/units with this...?
-
-#NPoints=25
-#MaxReps=350
-
-#testing point
-#pt=QgsPoint(-115.00886,44.15480)
+import numpy as np
 
 #create empty point layer to add to
 #points= QgsVectorLayer("Point?crs=epsg:4326&field=mytext:string(255)&field=mytext2:string(255)", "temporary_points", "memory")
@@ -47,71 +39,52 @@ def print_specs():
 
 #print_specs()
 
-#output from Idaho only WGS84
-#xmax=-111.0467713
-#ymax=48.9999503731
-#xmin=-117.236921306
-#ymin=41.9945993666
-#<qgis._core.QgsSpatialIndex object at 0x0000000022C969D8>
-#area=24.3915951649
-#dist=4.87831903298 #~ approx, did on calculator
-#distInf=0.95046957527
-#distSup=1.02980781586
-#True
-
-
-#xmin=-116.236921306 #known interior point for testing
-#ymin=42.9945993666
-
 #python implementation of pseudocode?
 
-NPoints=25
-MaxReps=350
+NPoints=20
+MaxReps=30
 for polygon in inlayer.getFeatures():
     bounds = polygon.geometry().boundingBox()
     rep=0
-    x=bounds.xMinimum()
-    y=bounds.yMinimum()
-    testing=[] #for testing
+    xmin=bounds.xMinimum()
+    ymin=bounds.yMinimum()
+    xmax = bounds.xMaximum()
+    ymax = bounds.yMaximum()
+    testing=[]
     area = polygon.geometry().area() 
     dist=sqrt(area / NPoints)
     distInf = sqrt(area / (NPoints + 2))
     distSup =sqrt(area /(NPoints - min(2, NPoints-1)))
-    #dist=4.87831903298 
-    #distInf=0.95046957527
-    #distSup=1.02980781586
-    #pointsIn=0
-    pointsIn=len(testing)
+   pointsIn=len(testing)
     firstTime=True
     while pointsIn != NPoints and rep<MaxReps:
         if not firstTime: #if I am reading the Cpp correctly, if firstTime = False, we delete everything and try again?
             testing=[]
         rep+=1
         print "rep=",rep
-        if not x >= bounds.xMaximum:
-            if not y >= bounds.yMaximum:
-                if polygon.geometry().contains (QgsPoint(x,y)):
+        for i in np.arange(xmin,xmax,dist):
+            for j in np.arange(ymin,ymax,dist):
+                if polygon.geometry().contains (QgsPoint(i,j)):
                     #feat = QgsFeature()
                     # feat.setAttributes([x,y])
                     # pt=QgsPoint(x,y)
                     # fet.setGeometry(QgsGeometry.fromPoint(pt))
                     # pr.addFeatures([fet])
-                    testing.append([x,y]) # for testing
-                    pointsIn+=1
-            print "sup,inf, dist is:" , [distSup,distInf,dist]
-            print "y=", y
-            print "x=", x
-            print testing
-            print firstTime
-            if pointsIn > NPoints:
-                distInf = dist
-                dist = (distInf + distSup)/2
-            elif pointsIn < NPoints:
-                distSup = dist
-                dist = (distInf + distSup)/2
-            x+=dist
-        y+=dist
-    firstTime=False
+                    testing.append([i,j])
+        pointsIn=len(testing)
+        print "sup,inf, dist is:" , [distSup,distInf,dist]
+            #print "y=", y
+            #print "x=", x
+        print "pointsIn:", pointsIn
+        print testing
+        print firstTime
+        if pointsIn > NPoints:
+            distInf = dist
+            dist = (distInf + distSup)/2
+        elif pointsIn < NPoints:
+            distSup = dist
+            dist = (distInf + distSup)/2
+        firstTime=False
 print "Done!"
 
 #add point layer to QGIS map
