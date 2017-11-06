@@ -10,38 +10,11 @@ from PyQt4.QtCore import *
 from math import *
 import numpy as np
 
-#create empty point layer to add to
-#points= QgsVectorLayer("Point?crs=epsg:4326&field=mytext:string(255)&field=mytext2:string(255)", "temporary_points", "memory")
-#pr = points.dataProvider()
-#pr.addAttributes([ QgsField("X", QVariant.Double), QgsField("Y", QVariant.Double) ])
-# need to change to float?
-
-#fet.setGeometry(QgsGeometry.fromPoint(bbox1))
-# pr.addFeatures([fet])
-
 #iterate through stands
 inlayer = processing.getObject(input_layer)
 
-def print_specs():
-    for polygon in inlayer.getFeatures():
-        bounds = polygon.geometry().boundingBox() #bounding box object
-        xmin = bounds.xMinimum()
-        xmax = bounds.xMaximum()
-        ymin = bounds.yMinimum()
-        ymax = bounds.yMaximum()
-        index = QgsSpatialIndex() #returns object
-        area = polygon.geometry().area() #gets passed object
-        dist=sqrt(area / NPoints)
-        distInf = sqrt(area / (NPoints + 2))
-        distSup =sqrt(area /(NPoints - min(2, NPoints-1)))
-        inshape=polygon.geometry().contains(pt)
-    print "xmax:",xmax,"\n","ymax:",ymax,"\n","xmin:",xmin,"\n","ymin",ymin,"\n","index",index,"\n","area:",area,"\n","distInf:",distInf,"\n","distSup:",distSup,"\n",inshape
-
-#print_specs()
-
 #python implementation of pseudocode?
-
-NPoints=20
+NPoints=30
 MaxReps=30
 for polygon in inlayer.getFeatures():
     bounds = polygon.geometry().boundingBox()
@@ -55,7 +28,7 @@ for polygon in inlayer.getFeatures():
     dist=sqrt(area / NPoints)
     distInf = sqrt(area / (NPoints + 2))
     distSup =sqrt(area /(NPoints - min(2, NPoints-1)))
-   pointsIn=len(testing)
+    pointsIn=len(testing)
     firstTime=True
     while pointsIn != NPoints and rep<MaxReps:
         if not firstTime: #if I am reading the Cpp correctly, if firstTime = False, we delete everything and try again?
@@ -72,9 +45,8 @@ for polygon in inlayer.getFeatures():
                     # pr.addFeatures([fet])
                     testing.append([i,j])
         pointsIn=len(testing)
+        #print statements for testing/diagnosis
         print "sup,inf, dist is:" , [distSup,distInf,dist]
-            #print "y=", y
-            #print "x=", x
         print "pointsIn:", pointsIn
         print testing
         print firstTime
@@ -87,5 +59,17 @@ for polygon in inlayer.getFeatures():
         firstTime=False
 print "Done!"
 
+
+#TO DO: add points to layer and show on map
 #add point layer to QGIS map
 #QgsMapLayerRegistry.instance().addMapLayer(points)
+
+
+#create empty point layer to add to
+#points= QgsVectorLayer("Point?crs=epsg:4326&field=mytext:string(255)&field=mytext2:string(255)", "temporary_points", "memory")
+#pr = points.dataProvider()
+#pr.addAttributes([ QgsField("X", QVariant.Double), QgsField("Y", QVariant.Double) ])
+# need to change to float?
+
+#fet.setGeometry(QgsGeometry.fromPoint(bbox1))
+# pr.addFeatures([fet])
